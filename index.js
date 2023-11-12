@@ -52,6 +52,9 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 
+app.get("/",(_, res)=>{
+  res.send("<h1> WELCOME </h1>")
+})
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 3001;
 mongoose

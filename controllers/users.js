@@ -4,7 +4,7 @@ import User from "../models/User.js";
 export const getUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findById(id).select("-password");
     res.status(200).json(user);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -14,10 +14,10 @@ export const getUser = async (req, res) => {
 export const getUserFriends = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findById(id).select("-password");
 
     const friends = await Promise.all(
-      user.friends.map((id) => User.findById(id))
+      user.friends.map((id) => User.findById(id).select("-password"))
     );
     const formattedFriends = friends.map(
       ({ _id, firstName, lastName, occupation, location, picturePath }) => {
@@ -34,8 +34,8 @@ export const getUserFriends = async (req, res) => {
 export const addRemoveFriend = async (req, res) => {
   try {
     const { id, friendId } = req.params;
-    const user = await User.findById(id);
-    const friend = await User.findById(friendId);
+    const user = await User.findById(id).select("-password")
+    const friend = await User.findById(friendId).select("-password");
 
     if (user.friends.includes(friendId)) {
       user.friends = user.friends.filter((id) => id !== friendId);
@@ -48,7 +48,7 @@ export const addRemoveFriend = async (req, res) => {
     await friend.save();
 
     const friends = await Promise.all(
-      user.friends.map((id) => User.findById(id))
+      user.friends.map((id) => User.findById(id).select("-password"))
     );
     const formattedFriends = friends.map(
       ({ _id, firstName, lastName, occupation, location, picturePath }) => {
