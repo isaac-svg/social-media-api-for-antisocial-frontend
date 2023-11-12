@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { omit } from "../lib/object.js";
 
 /* REGISTER USER */
 export const register = async (req, res) => {
@@ -42,7 +43,6 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password:pass } = req.body;
-    // console.log(email, password)
     const dbuser = await User.findOne({ email: email });
     if (!dbuser) return res.status(400).json({ msg: "User does not exist. " });
 
@@ -51,12 +51,8 @@ export const login = async (req, res) => {
 
     const token = jwt.sign({ id: dbuser._id }, process.env.JWT_SECRET);
 
-    
-   
-    // console.log(dbuser)
-    const {password,__v, ...user} = dbuser
-    // console.log({})
-    res.status(200).json({ token, user });
+    const {password,__v, ...user} = dbuser;
+    res.status(200).json({ token, user:omit(user._doc, ["password"]) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
